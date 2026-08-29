@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 const Reservations = () => {
-  const restaurantId=localStorage.getItem("restaurantId");
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,48 +13,60 @@ const Reservations = () => {
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    // If restaurantId is missing, alert and redirect or show fallback
-    if (!restaurantId) {
-      setError("Missing restaurant ID. Please log in or select a restaurant.");
+    if (!userId) {
+      setError("Please log in to view reservations.");
       setLoading(false);
       return;
     }
 
-    // Save to localStorage for persistence
-    localStorage.setItem("restaurantId", restaurantId);
-
     const fetchReservations = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/api/reservations-rest", {
-          params: {
-            restaurantId,
-            status: filterOption !== "all" ? filterOption : undefined,
-          },
-        });
+        const restaurantResponse = await axios.get(
+          `http://localhost:5000/api/users/${userId}/get-Res`
+        );
+        const assignedRestaurants = restaurantResponse.data || [];
 
-        if (response.data.success) {
-          setReservations(response.data.data);
-          setError(null);
-        } else {
+        if (assignedRestaurants.length === 0) {
           setReservations([]);
-          setError("No reservations found.");
+          setError("You have not been assigned to a restaurant yet.");
+          return;
         }
+
+        const reservationResponses = await Promise.all(
+          assignedRestaurants.map(async (restaurant) => {
+            try {
+              const response = await axios.get(
+                "http://localhost:5000/api/reservations-rest",
+                {
+                  params: {
+                    restaurantId: restaurant.RestaurantID,
+                    status:
+                      filterOption !== "all" ? filterOption : undefined,
+                  },
+                }
+              );
+              return response.data.data || [];
+            } catch (err) {
+              if (err.response?.status === 404) return [];
+              throw err;
+            }
+          })
+        );
+
+        setReservations(reservationResponses.flat());
+        setError(null);
       } catch (err) {
         console.error(err);
         setReservations([]);
-        setError(
-          err.response?.status === 404
-            ? "No reservations found."
-            : "Failed to fetch reservations."
-        );
+        setError("Failed to fetch reservations.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchReservations();
-  }, [filterOption, restaurantId]);
+  }, [filterOption, userId]);
 
   const handleFilterChange = (e) => setFilterOption(e.target.value);
   const handleSortChange = (e) => setSortOption(e.target.value);
