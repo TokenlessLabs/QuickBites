@@ -160,6 +160,10 @@ const AddReviews = () => {
           </Link>
         </div>
 
+        <p className="w-full max-w-6xl mt-6 text-sm text-gray-500">
+          You can only review restaurants where you have an approved table reservation.
+        </p>
+
         {/* Search Bar */}
         <div className="w-full max-w-6xl mt-12 mb-8 relative">
           <div className="w-full flex items-center bg-white border border-gray-300 rounded-full shadow-sm">
