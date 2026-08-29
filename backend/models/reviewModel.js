@@ -42,16 +42,16 @@ module.exports = {
               JOIN Tables T ON T.TableID = R.TableID
               WHERE R.UserID = @UserID
                 AND T.RestaurantID = @RestaurantID
-                AND R.Status = 'Completed'
-            ) THEN 1 ELSE 0 END AS HasCompletedReservation,
+                AND R.Status IN ('Approved', 'Completed')
+            ) THEN 1 ELSE 0 END AS HasApprovedReservation,
             CASE WHEN EXISTS (
               SELECT 1 FROM Reviews
               WHERE UserID = @UserID AND RestaurantID = @RestaurantID
             ) THEN 1 ELSE 0 END AS AlreadyReviewed;
         `);
 
-      if (!eligibility.recordset[0].HasCompletedReservation) {
-        throw new Error('You can review a restaurant after completing a reservation there.');
+      if (!eligibility.recordset[0].HasApprovedReservation) {
+        throw new Error('You can review a restaurant after your reservation is approved.');
       }
       if (eligibility.recordset[0].AlreadyReviewed) {
         throw new Error('You have already reviewed this restaurant.');

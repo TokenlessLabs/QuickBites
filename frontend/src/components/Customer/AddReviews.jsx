@@ -21,11 +21,11 @@ const AddReviews = () => {
       try {
         setIsLoading(true);
         const userId = localStorage.getItem("userId");
-        const [response, completedResponse, reviewsResponse] = await Promise.all([
+        const [response, approvedResponse, reviewsResponse] = await Promise.all([
           axios.get("http://localhost:5000/api/restaurants"),
           axios
             .get("http://localhost:5000/api/reservations-user", {
-              params: { status: "Completed" },
+              params: { status: "Approved,Completed" },
             })
             .catch(() => ({ data: { data: [] } })),
           axios
@@ -33,8 +33,8 @@ const AddReviews = () => {
             .catch(() => ({ data: { data: [] } })),
         ]);
 
-        const completedRestaurants = new Set(
-          (completedResponse.data.data || []).map(
+        const approvedRestaurants = new Set(
+          (approvedResponse.data.data || []).map(
             (reservation) => reservation.RestaurantName
           )
         );
@@ -43,7 +43,7 @@ const AddReviews = () => {
         );
         const restaurantData = response.data.data.filter(
           (restaurant) =>
-            completedRestaurants.has(restaurant.Name) &&
+            approvedRestaurants.has(restaurant.Name) &&
             !reviewedRestaurants.has(restaurant.Name)
         );
         setRestaurants(restaurantData);
@@ -178,7 +178,7 @@ const AddReviews = () => {
         <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {restaurants.length === 0 && (
             <p className="text-gray-500 col-span-full">
-              Complete a reservation before reviewing a restaurant.
+              You can review restaurants with an approved reservation.
             </p>
           )}
           {restaurants
