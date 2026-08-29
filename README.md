@@ -70,7 +70,7 @@ The contribution summaries below are based on the repository's Git history. Comm
 - Added restaurant integration, SQL query updates, profile-image fixes, and general bug fixes.
 - Managed and merged a large portion of the project's feature branches and pull requests.
 
-### 2. Meerab Munir - `Meerab`, `Meerab -`, and `fastcel`
+### 2. Meerab Munir - `fastcel`
 
 - Integrated tables, reservations, and payments with SQL Server.
 - Added SQL queries and customer reservation pages.
