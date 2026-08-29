@@ -1,6 +1,15 @@
 const { sql, poolPromise } = require('../config/db');
 
 const RestaurantModel = {
+  isRestaurantAdmin: async (UserID, RestaurantID) => {
+    const pool = await poolPromise;
+    const result = await pool.request()
+      .input('UserID', sql.Int, UserID)
+      .input('RestaurantID', sql.Int, RestaurantID)
+      .query('SELECT 1 AS Allowed FROM RestaurantAdmins WHERE UserID = @UserID AND RestaurantID = @RestaurantID');
+    return result.recordset.length > 0;
+  },
+
   // Fetch all restaurants
   getRestaurants: async () => {
     try {

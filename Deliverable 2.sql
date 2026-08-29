@@ -1585,6 +1585,25 @@ BEGIN
         RETURN;
     END
 
+    IF @Time <= GETDATE()
+    BEGIN
+        RAISERROR('Reservation time must be in the future.', 16, 1);
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1
+        FROM Reservations
+        WHERE TableID = @TableID
+          AND Status IN ('Pending', 'Approved')
+          AND Time < DATEADD(MINUTE, @Duration, @Time)
+          AND DATEADD(MINUTE, Duration, Time) > @Time
+    )
+    BEGIN
+        RAISERROR('Table is already reserved during the requested time slot.', 16, 1);
+        RETURN;
+    END
+
     -- Insert reservation
     INSERT INTO Reservations (UserID, TableID, Time, Duration, People, Request)
     VALUES (@UserID, @TableID, @Time, @Duration, @People, @Request);

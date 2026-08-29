@@ -223,7 +223,7 @@ const Profile = () => {
             oldPassword,
             newPassword,
           });
-        } catch (err) {
+        } catch {
           setErrors((prev) => ({
             ...prev,
             password: "Old password doesn't match.",

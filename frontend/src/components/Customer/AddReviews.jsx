@@ -20,10 +20,32 @@ const AddReviews = () => {
     const fetchRestaurants = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(
-          "http://localhost:5000/api/restaurants"
+        const userId = localStorage.getItem("userId");
+        const [response, completedResponse, reviewsResponse] = await Promise.all([
+          axios.get("http://localhost:5000/api/restaurants"),
+          axios
+            .get("http://localhost:5000/api/reservations-user", {
+              params: { status: "Completed" },
+            })
+            .catch(() => ({ data: { data: [] } })),
+          axios
+            .get(`http://localhost:5000/api/reviews-user/${userId}`)
+            .catch(() => ({ data: { data: [] } })),
+        ]);
+
+        const completedRestaurants = new Set(
+          (completedResponse.data.data || []).map(
+            (reservation) => reservation.RestaurantName
+          )
         );
-        const restaurantData = response.data.data;
+        const reviewedRestaurants = new Set(
+          (reviewsResponse.data.data || []).map((review) => review.Name)
+        );
+        const restaurantData = response.data.data.filter(
+          (restaurant) =>
+            completedRestaurants.has(restaurant.Name) &&
+            !reviewedRestaurants.has(restaurant.Name)
+        );
         setRestaurants(restaurantData);
 
         // Initialize image and rating data
@@ -75,7 +97,7 @@ const AddReviews = () => {
     navigate("/customer/restaurants/reviews");
   };
 
-  const RestaurantCard = ({ restaurant, index }) => {
+  const RestaurantCard = ({ restaurant }) => {
     const averageRating = ratings[restaurant.RestaurantID];
     const imageUrl = imageURLs[restaurant.RestaurantID] || defaultRestaurantPic;
     return (
@@ -154,15 +176,19 @@ const AddReviews = () => {
 
         {/* Restaurant Grid */}
         <div className="w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          {restaurants.length === 0 && (
+            <p className="text-gray-500 col-span-full">
+              Complete a reservation before reviewing a restaurant.
+            </p>
+          )}
           {restaurants
             .filter((restaurant) =>
               restaurant.Name.toLowerCase().includes(searchQuery.toLowerCase())
             )
-            .map((restaurant, index) => (
+            .map((restaurant) => (
               <RestaurantCard
-                key={index} // Use index as the key
+                key={restaurant.RestaurantID}
                 restaurant={restaurant}
-                index={index} // Pass index to the component
               />
             ))}
         </div>

@@ -14,6 +14,7 @@ const dbConfig = {
     encrypt: false, // Set to true if using Azure
     enableArithAbort: true,
     trustServerCertificate: true,
+    useUTC: false,
   },
 };
 
@@ -23,7 +24,10 @@ const poolPromise = new sql.ConnectionPool(dbConfig)
     console.log('Connected to MSSQL');
     return pool;
   })
-  .catch(err => console.log('Database Connection Failed!', err));
+  .catch(err => {
+    console.error('Database Connection Failed!', err.message);
+    throw err;
+  });
 
 
 module.exports = { sql, poolPromise };

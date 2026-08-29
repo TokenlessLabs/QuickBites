@@ -38,7 +38,7 @@ const RestaurantController = {
 
     try {
       const ProfilePic = req.file ? req.file.buffer : null;
-      const response = await RestaurantModel.registerRestaurant(req.body,ProfilePic);
+      const response = await RestaurantModel.registerRestaurant({ ...req.body, UserID: req.user.UserID },ProfilePic);
       if (!response.success) {
         return res.status(400).json({ success: false, message: response.message });
       }
@@ -56,7 +56,7 @@ const RestaurantController = {
     }
     try {
       const {
-UserID,RestaurantID,
+RestaurantID,
   Name,
   Description,
   Location,
@@ -64,6 +64,7 @@ UserID,RestaurantID,
   OperatingHoursStart, OperatingHoursEnd, Status
 } = req.body;
 
+const UserID = req.user.UserID;
 const profilePicBuffer = req.file ? req.file.buffer : null;
 
       const response = await RestaurantModel.updateRestaurant(UserID,RestaurantID,
@@ -85,7 +86,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
   // Delete a restaurant
   deleteRestaurant: async (req, res) => {
     const RestaurantID = parseInt(req.params.id);
-    const { UserID } = req.body; // Or from req.user.id if using auth middleware
+    const UserID = req.user.UserID;
   
     if (!UserID || isNaN(RestaurantID)) {
       return res.status(400).json({ success: false, message: 'UserID and valid RestaurantID are required' });
@@ -115,7 +116,8 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
 
   // Assign an admin to a restaurant
   assignAdmin: async (req, res) => {
-    const { UserID, TargetUsername } = req.body;
+    const { TargetUsername } = req.body;
+    const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
     try {
       const response = await RestaurantModel.assignAdmin({ RestaurantID, UserID, TargetUsername });
@@ -130,7 +132,8 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
 
   // Remove an admin from a restaurant
   removeAdmin: async (req, res) => {
-    const { UserID, TargetUserID } = req.body;
+    const { TargetUserID } = req.body;
+    const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
     try {
       const response = await RestaurantModel.removeAdmin({ RestaurantID, UserID, TargetUserID });
@@ -145,7 +148,8 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
 
   // Assign staff to a restaurant
   assignStaff: async (req, res) => {
-    const { UserID, TargetUsername } = req.body;
+    const { TargetUsername } = req.body;
+    const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
 
     if (!UserID || !TargetUsername || isNaN(RestaurantID)) {
@@ -165,7 +169,8 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
 
   // Remove staff from a restaurant
   removeStaff: async (req, res) => {
-    const { UserID, TargetUserID } = req.body;
+    const { TargetUserID } = req.body;
+    const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
 
     if (!UserID || !TargetUserID || isNaN(RestaurantID)) {
@@ -185,7 +190,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
 
   // Add an image to a restaurant
   addImage: async (req, res) => {
-    const { UserID } = req.body;
+    const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
     const Image = req.file ? req.file.buffer : null;
 
@@ -206,7 +211,8 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
 
   // Delete an image from a restaurant
   deleteImage: async (req, res) => {
-    const { ImageID, UserID } = req.body;
+    const { ImageID } = req.body;
+    const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
     try {
       const response = await RestaurantModel.deleteImage({ RestaurantID, ImageID, UserID });
@@ -223,6 +229,9 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
   getRestaurantAdmins: async (req, res) => {
     const RestaurantID = req.params.id;
     try {
+      if (!(await RestaurantModel.isRestaurantAdmin(req.user.UserID, RestaurantID))) {
+        return res.status(403).json({ success: false, message: 'You do not manage this restaurant.' });
+      }
       const response = await RestaurantModel.getRestaurantAdmins(RestaurantID);
       if (!response.success) {
         return res.status(404).json({ success: false, message: response.message });
@@ -237,6 +246,9 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
   getRestaurantStaff: async (req, res) => {
     const RestaurantID = req.params.id;
     try {
+      if (!(await RestaurantModel.isRestaurantAdmin(req.user.UserID, RestaurantID))) {
+        return res.status(403).json({ success: false, message: 'You do not manage this restaurant.' });
+      }
       const response = await RestaurantModel.getRestaurantStaff(RestaurantID);
       if (!response.success) {
         return res.status(404).json({ success: false, message: response.message });
@@ -269,6 +281,9 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
   setRestaurantStatus: async (req, res) => {
     const { restaurantId, status } = req.body;
     try {
+      if (!(await RestaurantModel.isRestaurantAdmin(req.user.UserID, restaurantId))) {
+        return res.status(403).json({ success: false, message: 'You do not manage this restaurant.' });
+      }
       const response = await RestaurantModel.setRestaurantStatus({ restaurantId, status });
 
       if (!response.success) {
@@ -285,6 +300,9 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
   addCuisineToRestaurant: async (req, res) => {
     const { RestaurantID, CuisineID } = req.body;
     try {
+      if (!(await RestaurantModel.isRestaurantAdmin(req.user.UserID, RestaurantID))) {
+        return res.status(403).json({ success: false, message: 'You do not manage this restaurant.' });
+      }
       const result = await RestaurantModel.addCuisineToRestaurant({ RestaurantID, CuisineID });
       if (!result.success) return res.status(400).json(result);
       return res.status(200).json({ success: true, message: result.message });
@@ -297,6 +315,9 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     removeCuisineFromRestaurant: async (req, res) => {
       const { RestaurantID, CuisineID } = req.query;
       try {
+        if (!(await RestaurantModel.isRestaurantAdmin(req.user.UserID, RestaurantID))) {
+          return res.status(403).json({ success: false, message: 'You do not manage this restaurant.' });
+        }
         const result = await RestaurantModel.removeCuisineFromRestaurant({ RestaurantID, CuisineID });
         if (!result.success) return res.status(400).json(result);
         return res.status(200).json({ success: true, message: result.message });

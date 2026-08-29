@@ -235,7 +235,7 @@ const Reservations = () => {
                   <div className="flex w-full justify-between">
                     <p className="flex justify-center items-center gap-1">
                       <strong>Special Request:</strong>{" "}
-                      {reservation.Request || "None"}
+                      {reservation.SpecialRequest || "None"}
                     </p>
                     {reservation.Status === "Pending" && (
                       <div className="flex w-1/2 flex-row items-center justify-end gap-4">

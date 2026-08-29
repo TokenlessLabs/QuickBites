@@ -28,8 +28,12 @@ const Login = () => {
 
       const user = authRes.data.data;
       const restaurantId = authRes.data.id;
+      const authToken = authRes.data.token;
       // Save user info
       localStorage.setItem("userId", JSON.stringify(user.UserID));
+      localStorage.setItem("userRole", user.Role);
+      localStorage.setItem("authToken", authToken);
+      axios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
       if (restaurantId) {
         localStorage.setItem("restaurantId", restaurantId);
       } else {

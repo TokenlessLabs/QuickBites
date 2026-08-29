@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const Reservations = () => {
@@ -10,8 +10,6 @@ const Reservations = () => {
   const [showModal, setShowModal] = useState(false);
 
   const userId = localStorage.getItem("userId");
-
-  const navigate = useNavigate();
 
   // Fetch reservations when component mounts or filter/sort options change
   const fetchReservations = async () => {
@@ -79,11 +77,6 @@ const Reservations = () => {
     const dateB = new Date(b.Time);
     return sortOption === "time-asc" ? dateA - dateB : dateB - dateA;
   });
-
-  const handleClick = (reservationID) => {
-    localStorage.setItem("reservationId", reservationID);
-    navigate("/customer/reservations/modify");
-  };
 
   return (
     <div className="h-screen text-theme-brown">

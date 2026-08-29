@@ -65,7 +65,7 @@ const Restaurants = () => {
                 `http://localhost:5000/api/stats/${r.RestaurantID}`
               );
               ratingsData[r.RestaurantID] = res.data.data.averageRating || "0";
-            } catch (err) {
+            } catch {
               ratingsData[r.RestaurantID] = "0";
             }
           })

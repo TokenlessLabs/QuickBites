@@ -7,7 +7,7 @@ const UserModel = {
       const pool = await poolPromise;
       const result = await pool.request()
         .query(`
-            Select * from Users
+            SELECT UserID, Name, Username, Email, PhoneNum, Role, ProfilePic FROM Users
         `);
 
         return result.recordset;
@@ -23,7 +23,7 @@ const UserModel = {
         const result = await pool.request()
             .input("UserID", sql.Int, id)
             .query(`
-                SELECT * FROM Users
+                SELECT UserID, Name, Username, Email, PhoneNum, Role, ProfilePic FROM Users
                 WHERE UserID = @UserID
             `);
 

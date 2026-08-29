@@ -15,8 +15,10 @@ module.exports = {
   // Get reviews by user
   getByUser: async (req, res) => {
     try {
-      const { userId } = req.params;
-      const reviews = await reviewModel.getReviewsByUser(userId);
+      if (req.user.Role !== 'Admin' && req.user.UserID !== Number(req.params.userId)) {
+        return res.status(403).json({ success: false, error: 'You can only view your own reviews.' });
+      }
+      const reviews = await reviewModel.getReviewsByUser(req.params.userId);
       res.json({ success: true, data: reviews });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
@@ -26,8 +28,8 @@ module.exports = {
   // Add review
   addReview: async (req, res) => {
     try {
-      const { userId, restaurantId, rating, comment } = req.body;
-      const result = await reviewModel.addReview(userId, restaurantId, rating, comment);
+      const { restaurantId, rating, comment } = req.body;
+      const result = await reviewModel.addReview(req.user.UserID, restaurantId, rating, comment);
       res.status(201).json({ success: true, message: result.message });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
@@ -66,8 +68,7 @@ module.exports = {
   deleteReview: async (req, res) => {
     try {
       const { reviewId } = req.params;
-      const { userId } = req.body;
-      const result = await reviewModel.deleteReview(reviewId, userId);
+      const result = await reviewModel.deleteReview(reviewId, req.user.UserID);
       res.json({ success: true, message: result.message });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });

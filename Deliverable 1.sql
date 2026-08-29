@@ -131,6 +131,10 @@ CREATE TABLE Payments(
     Method NVARCHAR(10) NOT NULL CHECK (Method IN ('Cash', 'Card'))
 );
 
+CREATE UNIQUE INDEX UQ_Payments_ReservationID
+ON Payments(ReservationID)
+WHERE ReservationID IS NOT NULL;
+
 
 -- ==========================
 --  INSERT DUMMY DATA

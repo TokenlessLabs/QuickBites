@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 const ReservationConfirmation = () => {
@@ -29,6 +29,10 @@ const ReservationConfirmation = () => {
 
   // Fetch filtered tables
   const fetchTables = async (capacityValue) => {
+    if (!restaurantId || !dateTime || !duration || Number(capacityValue) <= 0) {
+      setTables([]);
+      return;
+    }
     try {
       const res = await axios.get(
         `http://localhost:5000/api/restaurants/${restaurantId}/tables-by-capacity-time`,
@@ -51,10 +55,14 @@ const ReservationConfirmation = () => {
 
   // Fetch tables on mount or capacity change
   useEffect(() => {
-    if (restaurantId) {
+    if (restaurantId && dateTime && duration) {
       fetchTables(capacity);
     }
   }, [restaurantId, capacity]);
+
+  if (!dateTime || !duration) {
+    return <Navigate to="/customer/restaurants/reserve" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 relative">
@@ -88,7 +96,7 @@ const ReservationConfirmation = () => {
       <div className="flex flex-wrap gap-4 justify-center mb-6">
         <div>
           <label className="block text-center text-sm font-semibold text-gray-700 mb-1">
-            Minimum Capacity
+            Number of Guests
           </label>
           <input
             type="number"
@@ -96,7 +104,7 @@ const ReservationConfirmation = () => {
             className="border rounded px-3 py-2 w-40"
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
-            placeholder="Enter capacity"
+            placeholder="Enter party size"
           />
         </div>
       </div>
@@ -106,7 +114,7 @@ const ReservationConfirmation = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {tables.map((table, key) => (
             <div
-              key={table.id}
+              key={table.TableID}
               className="p-4 rounded shadow-md border border-gray-200"
             >
               <h2 className="text-lg font-semibold text-gray-800 mb-2">
@@ -128,6 +136,7 @@ const ReservationConfirmation = () => {
                     duration,
                     specialRequest,
                     capacity: table.Capacity,
+                    people: Number(capacity),
                     description: table.Description,
                   }}
                   className="w-full text-white rounded flex justify-center items-center bg-theme-pink hover:bg-pink-600 py-2"

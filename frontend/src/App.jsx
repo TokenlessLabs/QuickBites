@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Navigate, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import CustomerLayout from "./components/Customer/CustomerLayout";
@@ -11,7 +11,6 @@ import CustomerCurrentReservationsModify from "./components/Customer/ModifyReser
 import CustomerPastReservations from "./components/Customer/PastReservations";
 import CustomerReservationConfirmation from "./components/Customer/ReservationConfirmation";
 import CustomerReservationPayment from "./components/Customer/ReservationPayment";
-import CustomerModifyReservation from "./components/Customer/ModifyReservation";
 import CustomerAddReviews from "./components/Customer/AddReviews";
 import CustomerPastReviews from "./components/Customer/PastReviews";
 import CustomerPayments from "./components/Customer/Payments";
@@ -30,6 +29,15 @@ import StaffUpcomingReservations from "./components/Staff/UpcomingReservations";
 import StaffTables from "./components/Staff/Tables";
 import StaffProfile from "./components/Staff/Profile";
 
+const ProtectedRoute = ({ role, children }) => {
+  const token = localStorage.getItem("authToken");
+  const userRole = localStorage.getItem("userRole");
+
+  if (!token) return <Navigate to="/" replace />;
+  if (role && userRole !== role) return <Navigate to="/" replace />;
+  return children;
+};
+
 function App() {
   return (
     <Router>
@@ -37,7 +45,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        <Route path="/customer" element={<CustomerLayout />}>
+        <Route path="/customer" element={<ProtectedRoute role="Customer"><CustomerLayout /></ProtectedRoute>}>
           <Route path="restaurants" element={<CustomerRestaurants />} />
           <Route
             path="restaurants/details"
@@ -74,14 +82,10 @@ function App() {
           <Route path="reviews" element={<CustomerAddReviews />} />
           <Route path="reviews/past" element={<CustomerPastReviews />} />
           <Route path="payments" element={<CustomerPayments />} />
-          <Route
-            path="reservations/modify"
-            element={<CustomerModifyReservation />}
-          />
           <Route path="profile" element={<CustomerProfile />} />
         </Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<ProtectedRoute role="Admin"><AdminLayout /></ProtectedRoute>}>
           <Route path="restaurants" element={<AdminRestaurants />} />
           <Route
             path="restaurants/details"
@@ -100,7 +104,7 @@ function App() {
           <Route path="profile" element={<AdminProfile />} />
         </Route>
 
-        <Route path="/staff" element={<StaffLayout />}>
+        <Route path="/staff" element={<ProtectedRoute role="Staff"><StaffLayout /></ProtectedRoute>}>
           <Route path="reservations" element={<StaffReservations />} />
           <Route
             path="reservations/upcoming"

@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const cuisineController = require('../controllers/cuisineController');
+const { authenticate, requireRole } = require('../middleware/auth');
 
 // Cuisine operations
-router.post('/cuisines', cuisineController.addCuisine);
-router.put('/cuisines', cuisineController.updateCuisine);
-router.delete('/cuisines', cuisineController.deleteCuisine);
+router.post('/cuisines', authenticate, requireRole('Admin'), cuisineController.addCuisine);
+router.put('/cuisines', authenticate, requireRole('Admin'), cuisineController.updateCuisine);
+router.delete('/cuisines', authenticate, requireRole('Admin'), cuisineController.deleteCuisine);
 
 // Retrieve cuisines
 router.get('/cuisines', cuisineController.getAllCuisines);

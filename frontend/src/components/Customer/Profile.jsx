@@ -265,7 +265,7 @@ const Profile = () => {
             oldPassword,
             newPassword,
           });
-        } catch (err) {
+        } catch {
           setErrors((prev) => ({
             ...prev,
             password: "Old password doesn't match.",
@@ -302,7 +302,7 @@ const Profile = () => {
             )
           ),
         ]);
-      } catch (err) {
+      } catch {
         throw new Error("Failed to update cuisine preferences.");
       }
 
@@ -337,7 +337,7 @@ const Profile = () => {
             )
           ),
         ]);
-      } catch (err) {
+      } catch {
         throw new Error("Failed to update restaurant preferences.");
       }
 
