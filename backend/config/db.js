@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const sql = require('mssql');
 
 
@@ -8,15 +9,14 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   server: process.env.DB_SERVER,
   database: process.env.DB_NAME,
-  //port: process.env.DB_PORT, 
+  port: Number(process.env.DB_PORT || 1433),
   options: {
     encrypt: false, // Set to true if using Azure
     enableArithAbort: true,
     trustServerCertificate: true,
+    useUTC: false,
   },
 };
-
-console.log("DB Config:", dbConfig);
 
 const poolPromise = new sql.ConnectionPool(dbConfig)
   .connect()
@@ -24,7 +24,10 @@ const poolPromise = new sql.ConnectionPool(dbConfig)
     console.log('Connected to MSSQL');
     return pool;
   })
-  .catch(err => console.log('Database Connection Failed!', err));
+  .catch(err => {
+    console.error('Database Connection Failed!', err.message);
+    throw err;
+  });
 
 
 module.exports = { sql, poolPromise };

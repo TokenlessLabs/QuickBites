@@ -8,7 +8,6 @@ const UpcomingReservations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const restaurantId = localStorage.getItem("restaurantId");
   const userId = localStorage.getItem("userId");
 
   const toggleExpand = (id) => {
@@ -24,33 +23,45 @@ const UpcomingReservations = () => {
   };
 
  const fetchReservations = async () => {
-  if (!restaurantId) {
-    setError("Restaurant ID not found.");
+  if (!userId) {
+    setError("Please log in to view reservations.");
     setLoading(false);
     return;
   }
 
   try {
-    const response = await axios.get(
-      `http://localhost:5000/api/reservations-rest-today?restaurantId=${restaurantId}`
+    setLoading(true);
+    const restaurantResponse = await axios.get(
+      `http://localhost:5000/api/users/${userId}/get-Res`
+    );
+    const assignedRestaurants = restaurantResponse.data || [];
+
+    if (assignedRestaurants.length === 0) {
+      setReservations([]);
+      setError("You have not been assigned to a restaurant yet.");
+      return;
+    }
+
+    const reservationResponses = await Promise.all(
+      assignedRestaurants.map(async (restaurant) => {
+        try {
+          const response = await axios.get(
+            `http://localhost:5000/api/reservations-rest-today?restaurantId=${restaurant.RestaurantID}`
+          );
+          return response.data.data || [];
+        } catch (err) {
+          if (err.response?.status === 404) return [];
+          throw err;
+        }
+      })
     );
 
-    if (response.data.success) {
-      setReservations(response.data.data);
-      setError(null); // Clear any previous error
-    } else {
-      setError(response.data.message || "Failed to fetch reservations.");
-    }
+    setReservations(reservationResponses.flat());
+    setError(null);
   } catch (err) {
-    if (err.response) {
-      if (err.response.status === 404) {
-        setError("No reservations found for today.");
-      } else {
-        setError(`Error ${err.response.status}: ${err.response.data.message || "Unexpected error."}`);
-      }
-    } else {
-      setError("Network error or server is unreachable.");
-    }
+    console.error(err);
+    setReservations([]);
+    setError("Failed to fetch today's reservations.");
   } finally {
     setLoading(false);
   }
@@ -87,7 +98,7 @@ const UpcomingReservations = () => {
 
   useEffect(() => {
     fetchReservations();
-  }, [restaurantId]);
+  }, [userId]);
 
   return (
     <div className="h-screen">

@@ -81,7 +81,7 @@ const Restaurants = () => {
           setRestaurants(toProcessed(restaurantsRes.data.data));
           setCuisinePrefs(toProcessed(cuisinePrefsRes.data.data));
           setRestsPrefs(toProcessed(restsPrefsRes.data.data));
-        } catch (err) {
+        } catch {
           setError("An error occurred while fetching data.");
         } finally {
           setLoading(false);

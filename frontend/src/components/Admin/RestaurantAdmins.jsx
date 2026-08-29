@@ -77,7 +77,7 @@ const RestaurantAdmins = () => {
       } else {
         setErrorMessage(response.data.message || "Failed to assign admin.");
       }
-    } catch (error) {
+    } catch {
       setErrorMessage("Failed to assign admin.");
     }
   };

@@ -33,8 +33,8 @@ const RestaurantReservation = () => {
 
         setRestaurantName(Name || "Restaurant");
 
-        const startHour = new Date(OperatingHoursStart).getHours();
-        const endHour = new Date(OperatingHoursEnd).getHours();
+        const startHour = new Date(OperatingHoursStart).getUTCHours();
+        const endHour = new Date(OperatingHoursEnd).getUTCHours();
 
         setOpeningHour(startHour);
         setClosingHour(endHour);
@@ -63,14 +63,20 @@ const RestaurantReservation = () => {
       tenDaysLater.setDate(now.getDate() + 10);
 
       const selectedHour = selectedDateTime.getHours();
+      let normalizedStart = selectedHour;
+      let normalizedClosing = closingHour;
+
+      if (closingHour <= openingHour) {
+        normalizedClosing += 24;
+        if (normalizedStart < openingHour) normalizedStart += 24;
+      }
 
       if (selectedDateTime <= now) errors.pastDate = true;
       if (selectedDateTime > tenDaysLater) errors.futureDate = true;
 
       const isWithinOperatingHours =
-        closingHour > openingHour
-          ? selectedHour >= openingHour && selectedHour < closingHour
-          : selectedHour >= openingHour || selectedHour < closingHour;
+        normalizedStart >= openingHour &&
+        normalizedStart + duration <= normalizedClosing;
 
       if (!isWithinOperatingHours) errors.outsideHours = true;
     }
@@ -164,7 +170,9 @@ const RestaurantReservation = () => {
           >
             {Array.from({ length: 8 }, (_, i) => 0.5 + i * 0.5).map((val) => (
               <option key={val} value={val}>
-                {val === 0.5 ? "30 minutes" : `${val} hours`}
+                {val === 0.5
+                  ? "30 minutes"
+                  : `${val} ${val === 1 ? "hour" : "hours"}`}
               </option>
             ))}
           </select>

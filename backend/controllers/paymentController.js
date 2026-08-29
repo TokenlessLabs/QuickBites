@@ -14,6 +14,9 @@ exports.insertPayment = async (req, res) => {
 // Get user's payment history
 exports.getUserPaymentHistory = async (req, res) => {
   try {
+    if (req.user.Role !== 'Admin' && req.user.UserID !== Number(req.params.userId)) {
+      return res.status(403).json({ error: 'You can only view your own payments.' });
+    }
     const result = await PaymentModel.getUserPaymentHistory(req.params.userId);
     res.status(200).json(result);
   } catch (err) {

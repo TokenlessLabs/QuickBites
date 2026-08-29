@@ -20,8 +20,8 @@ exports.checkTableAvailability = async (req, res) => {
 
 exports.addTable = async (req, res) => {
   try {
-    const { userId, capacity, description, restaurantId } = req.body;
-    const result = await TableModel.addTable(userId, capacity, description, restaurantId);
+    const { capacity, description, restaurantId } = req.body;
+    const result = await TableModel.addTable(req.user.UserID, capacity, description, restaurantId);
     res.status(201).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -30,9 +30,9 @@ exports.addTable = async (req, res) => {
 
 exports.updateTable = async (req, res) => {
   try {
-    const { userId, capacity, status, description } = req.body;
+    const { capacity, status, description } = req.body;
     const tableId = req.params.id;
-    const result = await TableModel.updateTable(userId, tableId, capacity, status, description);
+    const result = await TableModel.updateTable(req.user.UserID, tableId, capacity, status, description);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -41,8 +41,7 @@ exports.updateTable = async (req, res) => {
 
 exports.deleteTable = async (req, res) => {
   try {
-    const { userId } = req.body;
-    const result = await TableModel.deleteTable(userId, req.params.id);
+    const result = await TableModel.deleteTable(req.user.UserID, req.params.id);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -51,9 +50,9 @@ exports.deleteTable = async (req, res) => {
 
 exports.updateTableStatus = async (req, res) => {
   try {
-    const { userId, newStatus } = req.body;
+    const { newStatus } = req.body;
     const tableId = req.params.id;
-    const result = await TableModel.updateTableStatus(userId, tableId, newStatus);
+    const result = await TableModel.updateTableStatus(req.user.UserID, tableId, newStatus);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });

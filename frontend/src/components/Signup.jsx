@@ -11,7 +11,7 @@ const Signup = () => {
     email: "",
     password: "",
     phone: "",
-    role: "customer",
+    role: "Customer",
     profilePic: null,
   });
   const [preview, setPreview] = useState(null);
@@ -76,7 +76,7 @@ const Signup = () => {
       userPayload.append("profilePic", formData.profilePic);
 
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/users",
         userPayload,
         {
@@ -85,14 +85,6 @@ const Signup = () => {
           },
         }
       );
-
-      console.log("User created successfully:", response.data);
-
-      // Fetch user details after creation (using the user ID from the response)
-      const userId = response.data.userId;
-
-      // Store the user ID in local storage
-      localStorage.setItem("userId", userId);
 
       setModalVisible(true); // Show the modal on successful signup
     } catch (err) {
@@ -138,13 +130,7 @@ const Signup = () => {
 
   const handleModalClose = () => {
     setModalVisible(false);
-    if (formData.role === "Admin") {
-      navigate("/admin/restaurants");
-    } else if (formData.role === "Staff") {
-      navigate("/staff/reservations");
-    } else {
-      navigate("/customer/restaurants");
-    }
+    navigate("/");
   };
 
   return (
@@ -271,7 +257,6 @@ const Signup = () => {
                 >
                   <option value="Customer">Customer</option>
                   <option value="Staff">Staff</option>
-                  <option value="Admin">Admin</option>
                 </select>
                 {errors.role && (
                   <p className="text-red-500 text-sm mt-1">{errors.role}</p>

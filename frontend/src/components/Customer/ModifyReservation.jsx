@@ -148,7 +148,7 @@ const ModifyReservation = () => {
                   {filteredTables.length > 0 ? (
                     filteredTables.map((table) => (
                       <div
-                        key={table.id}
+                        key={table.TableID}
                         className={`p-4 border rounded shadow cursor-pointer ${
                           selectedTableId === table.id
                             ? "border-pink-500 bg-pink-50"

@@ -33,7 +33,7 @@ CREATE TABLE Restaurants(
     RestaurantID INT IDENTITY(1,1) PRIMARY KEY,
     Name NVARCHAR(50) NOT NULL,
     Description NVARCHAR(MAX) NOT NULL,
-    Location NVARCHAR(100) NOT NULL,
+    Location NVARCHAR(300) NOT NULL,
     PhoneNum NVARCHAR(13) UNIQUE NOT NULL,
     OperatingHoursStart TIME NOT NULL,
     OperatingHoursEnd TIME NOT NULL,
@@ -130,6 +130,10 @@ CREATE TABLE Payments(
     Status NVARCHAR(10) NOT NULL CHECK (Status IN ('Pending', 'Completed', 'Failed')),
     Method NVARCHAR(10) NOT NULL CHECK (Method IN ('Cash', 'Card'))
 );
+
+CREATE UNIQUE INDEX UQ_Payments_ReservationID
+ON Payments(ReservationID)
+WHERE ReservationID IS NOT NULL;
 
 
 -- ==========================

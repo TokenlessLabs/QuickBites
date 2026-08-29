@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const ReservationPayment = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
   const {
     tableId,
     restaurantName,
@@ -13,6 +12,7 @@ const ReservationPayment = () => {
     duration,
     specialRequest,
     capacity,
+    people,
     description,
   } = location.state || {};
 
@@ -21,30 +21,19 @@ const ReservationPayment = () => {
     success: false,
     message: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const isoDateTime1 = new Date(dateTime).toISOString();
-      const res = await axios.post("http://localhost:5000/api/reservations", {
-        userId,
+      const res = await axios.post("http://localhost:5000/api/reservations/checkout", {
         tableId,
         time: isoDateTime1,
         duration: duration * 60,
-        people: capacity,
+        people,
         request: specialRequest,
-      });
-      const reservationId = res.data.data;
-      const amount = 100; // Set amount for the reservation
-      const status = "Completed"; // Payment status
-      const method = "Card"; // Payment method
-      const isoDateTime2 = new Date(dateTime).toISOString();
-
-      await axios.post("http://localhost:5000/api/payments", {
-        reservationId,
-        amount,
-        status,
-        method,
-        date: isoDateTime2,
       });
 
       setModal({ open: true, success: true, message: res.data.message });
@@ -54,6 +43,8 @@ const ReservationPayment = () => {
         success: false,
         message: error.response?.data?.message || "Failed to add reservation",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -63,6 +54,10 @@ const ReservationPayment = () => {
       navigate("/customer/reservations");
     }
   };
+
+  if (!tableId || !dateTime || !duration || !people) {
+    return <Navigate to="/customer/restaurants/reserve" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 relative">
@@ -119,6 +114,9 @@ const ReservationPayment = () => {
               <strong>Table Capacity:</strong> {capacity} seats
             </p>
             <p className="text-gray-700">
+              <strong>Guests:</strong> {people}
+            </p>
+            <p className="text-gray-700">
               <strong>Table Description:</strong> {description}
             </p>
           </div>
@@ -144,9 +142,10 @@ const ReservationPayment = () => {
           <div className="mt-8">
             <button
               onClick={handleConfirm}
-              className="w-full py-3 flex items-center justify-center bg-theme-pink text-white font-semibold rounded hover:bg-pink-600 transition duration-200"
+              disabled={submitting}
+              className="w-full py-3 flex items-center justify-center bg-theme-pink text-white font-semibold rounded hover:bg-pink-600 transition duration-200 disabled:opacity-50"
             >
-              Confirm Reservation
+              {submitting ? "Confirming..." : "Confirm Reservation"}
             </button>
           </div>
         </div>
