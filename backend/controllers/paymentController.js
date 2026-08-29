@@ -1,6 +1,5 @@
 const PaymentModel = require('../models/paymentModel');
 
-// Insert a new payment
 exports.insertPayment = async (req, res) => {
   try {
     const { reservationId, amount, status, method, date } = req.body;
@@ -11,7 +10,6 @@ exports.insertPayment = async (req, res) => {
   }
 };
 
-// Get user's payment history
 exports.getUserPaymentHistory = async (req, res) => {
   try {
     if (req.user.Role !== 'Admin' && req.user.UserID !== Number(req.params.userId)) {
@@ -24,7 +22,6 @@ exports.getUserPaymentHistory = async (req, res) => {
   }
 };
 
-// Update payment status
 exports.updatePaymentStatus = async (req, res) => {
   try {
     const { paymentId, newStatus } = req.body;
@@ -35,7 +32,6 @@ exports.updatePaymentStatus = async (req, res) => {
   }
 };
 
-// Delete a payment (admin only)
 exports.deletePayment = async (req, res) => {
   try {
     const response = await PaymentModel.deletePayment(req.params.paymentId);
@@ -45,7 +41,6 @@ exports.deletePayment = async (req, res) => {
   }
 };
 
-// Get total revenue for a restaurant
 exports.getTotalRevenueByRestaurant = async (req, res) => {
   try {
     const result = await PaymentModel.getTotalRevenueByRestaurant(req.params.restaurantId);

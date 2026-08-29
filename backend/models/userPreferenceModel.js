@@ -1,7 +1,6 @@
 const { sql, poolPromise } = require('../config/db');
 
 const UserPreferenceModel = {
-    // Get cuisine preferences
     getCuisinePreferences: async (userId) => {
         try {
         const pool = await poolPromise;
@@ -19,7 +18,6 @@ const UserPreferenceModel = {
         }
     },
 
-    // Add a cuisine preference
     addCuisinePreference: async (userId, cuisineId) => {
         try {
         const pool = await poolPromise;
@@ -34,7 +32,6 @@ const UserPreferenceModel = {
         }
     },
 
-    // Remove a cuisine preference
     removeCuisinePreference: async (userId, cuisineId) => {
         try {
         const pool = await poolPromise;
@@ -49,7 +46,6 @@ const UserPreferenceModel = {
         }
     },
 
-    // Get restaurant preferences
     getRestaurantPreferences: async (userId) => {
         try {
         const pool = await poolPromise;
@@ -66,8 +62,6 @@ const UserPreferenceModel = {
         throw new Error(error.message);
         }
     },
-
-    // Add a restaurant preference
     addRestaurantPreference: async (userId, restaurantId) => {
         try {
         const pool = await poolPromise;
@@ -82,7 +76,6 @@ const UserPreferenceModel = {
         }
     },
 
-    // Remove a restaurant preference
     removeRestaurantPreference: async (userId, restaurantId) => {
         try {
         const pool = await poolPromise;

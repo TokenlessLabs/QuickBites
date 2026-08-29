@@ -1,7 +1,6 @@
 const { sql, poolPromise } = require('../config/db');
 
 const PaymentModel = {
-  // Insert a new payment
   insertPayment: async (reservationId, amount, status, method, date) => {
     try {
       const pool = await poolPromise;
@@ -19,7 +18,6 @@ const PaymentModel = {
     }
   },
 
-  // Get payment history for a user
   getUserPaymentHistory: async (userId) => {
     try {
       const pool = await poolPromise;
@@ -49,7 +47,6 @@ const PaymentModel = {
     }
   },
 
-  // Update payment status
   updatePaymentStatus: async (paymentId, newStatus) => {
     try {
       const pool = await poolPromise;
@@ -64,7 +61,6 @@ const PaymentModel = {
     }
   },
 
-  // Delete a payment (admin only)
   deletePayment: async (paymentId) => {
     try {
       const pool = await poolPromise;
@@ -80,7 +76,6 @@ const PaymentModel = {
     }
   },
 
-  // Get total revenue for a restaurant
   getTotalRevenueByRestaurant: async (restaurantId) => {
     try {
       const pool = await poolPromise;

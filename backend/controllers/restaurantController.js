@@ -2,7 +2,6 @@ const RestaurantModel = require('../models/restaurantModel');
 const { validationResult } = require('express-validator');
 
 const RestaurantController = {
-  // Get all restaurants
   getRestaurants: async (req, res) => {
     try {
       const response = await RestaurantModel.getRestaurants();
@@ -15,7 +14,6 @@ const RestaurantController = {
     }
   },
 
-  // Get restaurant by ID
   getRestaurantById: async (req, res) => {
     const { id } = req.params;
     try {
@@ -29,7 +27,6 @@ const RestaurantController = {
     }
   },
 
-  // Register a new restaurant
   registerRestaurant: async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -48,7 +45,6 @@ const RestaurantController = {
     }
   },
 
-  // Update an existing restaurant
   updateRestaurant: async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -83,7 +79,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Delete a restaurant
   deleteRestaurant: async (req, res) => {
     const RestaurantID = parseInt(req.params.id);
     const UserID = req.user.UserID;
@@ -100,7 +95,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Search for restaurants with filters
   searchRestaurants: async (req, res) => {
     const { userId, filterBy, location, sortBy } = req.query;
     try {
@@ -114,7 +108,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Assign an admin to a restaurant
+
   assignAdmin: async (req, res) => {
     const { TargetUsername } = req.body;
     const UserID = req.user.UserID;
@@ -130,7 +124,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Remove an admin from a restaurant
+
   removeAdmin: async (req, res) => {
     const { TargetUserID } = req.body;
     const UserID = req.user.UserID;
@@ -146,7 +140,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Assign staff to a restaurant
   assignStaff: async (req, res) => {
     const { TargetUsername } = req.body;
     const UserID = req.user.UserID;
@@ -167,7 +160,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Remove staff from a restaurant
   removeStaff: async (req, res) => {
     const { TargetUserID } = req.body;
     const UserID = req.user.UserID;
@@ -188,7 +180,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Add an image to a restaurant
   addImage: async (req, res) => {
     const UserID = req.user.UserID;
     const RestaurantID = parseInt(req.params.id);
@@ -209,7 +200,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Delete an image from a restaurant
   deleteImage: async (req, res) => {
     const { ImageID } = req.body;
     const UserID = req.user.UserID;
@@ -225,7 +215,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Get restaurant admins
   getRestaurantAdmins: async (req, res) => {
     const RestaurantID = req.params.id;
     try {
@@ -242,7 +231,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Get restaurant staff
   getRestaurantStaff: async (req, res) => {
     const RestaurantID = req.params.id;
     try {
@@ -259,7 +247,6 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Get images for a restaurant
   getRestaurantImages: async (req, res) => {
     try {
       const images = await RestaurantModel.getRestaurantImages(req.params.id);
@@ -277,7 +264,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  // Set restaurant status
+
   setRestaurantStatus: async (req, res) => {
     const { restaurantId, status } = req.body;
     try {
@@ -296,7 +283,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  //Add cuisine
+
   addCuisineToRestaurant: async (req, res) => {
     const { RestaurantID, CuisineID } = req.body;
     try {
@@ -311,7 +298,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
     }
   },
 
-  //Remove cuisine
+
     removeCuisineFromRestaurant: async (req, res) => {
       const { RestaurantID, CuisineID } = req.query;
       try {
@@ -326,7 +313,7 @@ const profilePicBuffer = req.file ? req.file.buffer : null;
       }
     },
 
-  //Get restaurant's offered cuisines
+
   getCuisinesForRestaurant: async (req, res) => {
     const { id } = req.params;
     try {

@@ -1,7 +1,6 @@
 const reviewModel = require('../models/reviewModel');
 
 module.exports = {
-  // Get reviews by restaurant
   getByRestaurant: async (req, res) => {
     try {
       const { restaurantId } = req.params;
@@ -12,7 +11,6 @@ module.exports = {
     }
   },
 
-  // Get reviews by user
   getByUser: async (req, res) => {
     try {
       if (req.user.Role !== 'Admin' && req.user.UserID !== Number(req.params.userId)) {
@@ -25,7 +23,6 @@ module.exports = {
     }
   },
 
-  // Add review
   addReview: async (req, res) => {
     try {
       const { restaurantId, rating, comment } = req.body;
@@ -36,7 +33,6 @@ module.exports = {
     }
   },
 
-  // Get review stats
   getStats: async (req, res) => {
     try {
       const { restaurantId } = req.params;
@@ -64,7 +60,6 @@ module.exports = {
     }
   },
 
-  // Delete review
   deleteReview: async (req, res) => {
     try {
       const { reviewId } = req.params;
@@ -75,7 +70,6 @@ module.exports = {
     }
   },
 
-  // Get top rated
   getTopRated: async (req, res) => {
     try {
       const { cuisine } = req.query;
@@ -88,7 +82,6 @@ module.exports = {
     }
   },
 
-  // Sort reviews
   sortReviews: async (req, res) => {
     try {
       const { type, id } = req.params;

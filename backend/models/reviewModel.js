@@ -1,7 +1,6 @@
 const { sql, poolPromise } = require('../config/db');
 
 module.exports = {
-  // Get reviews by restaurant
   getReviewsByRestaurant: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -14,7 +13,6 @@ module.exports = {
     }
   },
 
-  // Get reviews by user
   getReviewsByUser: async (userId) => {
     try {
       const pool = await poolPromise;
@@ -27,7 +25,6 @@ module.exports = {
     }
   },
 
-  // Add new review
   addReview: async (userId, restaurantId, rating, comment) => {
     try {
       const pool = await poolPromise;
@@ -69,7 +66,6 @@ module.exports = {
     }
   },
 
-  // Get review count for restaurant
   getReviewCount: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -82,7 +78,6 @@ module.exports = {
     }
   },
 
-  // Get average rating for restaurant
   getAverageRating: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -100,7 +95,6 @@ module.exports = {
     }
   },
 
-  //Get total Reservations
     getTotalReservations: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -118,7 +112,6 @@ module.exports = {
     }
   },
 
-    //Get total Revenue
     getTotalRevenue: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -138,7 +131,6 @@ module.exports = {
     }
   },
 
-      //Get No. of Admins
     getNoOfAdmins: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -155,7 +147,6 @@ module.exports = {
     }
   },
 
-        //Get No. of Staff
     getNoOfStaff: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -172,7 +163,6 @@ module.exports = {
     }
   },
 
-  // Delete review
   deleteReview: async (reviewId, userId) => {
     try {
       const pool = await poolPromise;
@@ -186,7 +176,6 @@ module.exports = {
     }
   },
 
-  // Get top rated restaurants
   getTopRatedRestaurants: async () => {
     try {
       const pool = await poolPromise;
@@ -204,7 +193,6 @@ module.exports = {
     }
   },
 
-  // Get top rated by cuisine
   getTopRatedByCuisine: async (cuisineName) => {
     try {
       const pool = await poolPromise;
@@ -226,7 +214,6 @@ module.exports = {
     }
   },
 
-  // Sort user reviews
   sortUserReviews: async (userId, sortOrder) => {
     try {
       const pool = await poolPromise;
@@ -240,7 +227,6 @@ module.exports = {
     }
   },
 
-  // Sort restaurant reviews
   sortRestaurantReviews: async (restaurantId, sortOrder) => {
     try {
       const pool = await poolPromise;

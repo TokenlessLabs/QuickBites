@@ -1,7 +1,6 @@
 const { sql, poolPromise } = require('../config/db');
 
 const TableModel = {
-  //Get all tables by restaurant
   getTablesByRestaurant: async (id) => {
     try {
       const pool = await poolPromise;
@@ -16,7 +15,6 @@ const TableModel = {
     }
   },
 
-//Check to see if a table is available
   checkTableAvailability: async (tableId) => {
     try {
       const pool = await poolPromise;
@@ -29,7 +27,6 @@ const TableModel = {
     }
   },
 
-  //Add a new table to a restaurant
   addTable: async (userId, capacity, description, restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -45,7 +42,6 @@ const TableModel = {
     }
   },
 
-  //Update table information
   updateTable: async (userId, tableId, capacity = null, status = null, description = null) => {
     try {
       const pool = await poolPromise;
@@ -62,7 +58,6 @@ const TableModel = {
     }
   },
 
-  //Delete a table
   deleteTable: async (userId, tableId) => {
     try {
       const pool = await poolPromise;
@@ -76,7 +71,6 @@ const TableModel = {
     }
   },
 
-  //Update table's availability status
   updateTableStatus: async (userId, tableId, newStatus) => {
     try {
       const pool = await poolPromise;
@@ -91,7 +85,6 @@ const TableModel = {
     }
   },
 
-  //Retrieve all the available tables
   getAvailableTables: async (restaurantId) => {
     try {
       const pool = await poolPromise;
@@ -104,7 +97,6 @@ const TableModel = {
     }
   },
 
-  //Retrieve tables by their capacity
   getTablesByCapacity: async (restaurantId, minCapacity = null) => {
     try {
       const pool = await poolPromise;
@@ -118,7 +110,6 @@ const TableModel = {
     }
   },
 
-  //Retrieve tables by their capacity and time
   getTablesByCapacityAndTime: async (restaurantId, minCapacity = null, startTime, durationMinutes) => {
     try {
       const pool = await poolPromise;
@@ -134,7 +125,6 @@ const TableModel = {
     }
   },
 
-  //Reset table at closing time
   resetTablesAtClosing: async (restaurantId) => {
     try {
       const pool = await poolPromise;

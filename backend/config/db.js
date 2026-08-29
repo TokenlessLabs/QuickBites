@@ -3,7 +3,6 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const sql = require('mssql');
 
 
-// Database configuration
 const dbConfig = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -11,7 +10,7 @@ const dbConfig = {
   database: process.env.DB_NAME,
   port: Number(process.env.DB_PORT || 1433),
   options: {
-    encrypt: false, // Set to true if using Azure
+    encrypt: false,
     enableArithAbort: true,
     trustServerCertificate: true,
     useUTC: false,

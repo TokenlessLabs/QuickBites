@@ -10,7 +10,6 @@ const RestaurantModel = {
     return result.recordset.length > 0;
   },
 
-  // Fetch all restaurants
   getRestaurants: async () => {
     try {
       const pool = await poolPromise;
@@ -24,7 +23,6 @@ const RestaurantModel = {
     }
   },
 
-  // Fetch a restaurant by its ID
   getRestaurantById: async (id) => {
     try {
       const pool = await poolPromise;
@@ -40,7 +38,6 @@ const RestaurantModel = {
     }
   },
 
-  // Register a new restaurant
   registerRestaurant: async (data,ProfilePic) => {
     const { UserID, Name, Description, Location, PhoneNum, OperatingHoursStart, OperatingHoursEnd } = data;
     try {
@@ -64,7 +61,6 @@ const RestaurantModel = {
     }
   },
 
-  // Update an existing restaurant
   updateRestaurant: async (UserID, RestaurantID, Name, Description, Location, PhoneNum, OperatingHoursStart, OperatingHoursEnd, Status, ProfilePic = null) => {
     try {
       const pool = await poolPromise;
@@ -88,7 +84,6 @@ const RestaurantModel = {
     }
   },
 
-  // Delete a restaurant
   deleteRestaurant: async (UserID, RestaurantID) => {
     try {
       const pool = await poolPromise;
@@ -102,7 +97,6 @@ const RestaurantModel = {
     }
   },
 
-  // Search for restaurants based on various filters
   searchRestaurants: async ({ userId, filterBy=null, location=null, sortBy = 'Name' }) => {
     try {
       const pool = await poolPromise;
@@ -124,7 +118,6 @@ const RestaurantModel = {
     }
   },
 
-  // Get all admins of a restaurant
   getRestaurantAdmins: async (RestaurantID) => {
     try {
       const pool = await poolPromise;
@@ -140,7 +133,6 @@ const RestaurantModel = {
     }
   },
 
-  // Get all staff of a restaurant
   getRestaurantStaff: async (RestaurantID) => {
     try {
       const pool = await poolPromise;
@@ -156,7 +148,6 @@ const RestaurantModel = {
     }
   },
 
-  // Get all images of a restaurant
   getRestaurantImages: async (RestaurantID) => {
     try {
       const pool = await poolPromise;
@@ -172,7 +163,6 @@ const RestaurantModel = {
     }
   },
 
-  // Assign an admin to the restaurant
   assignAdmin: async ({ RestaurantID, UserID, TargetUsername }) => {
     try {
       const pool = await poolPromise;
@@ -187,7 +177,6 @@ const RestaurantModel = {
     }
   },
 
-  // Remove an admin from the restaurant
   removeAdmin: async ({ RestaurantID, UserID, TargetUserID }) => {
     try {
       const pool = await poolPromise;
@@ -202,7 +191,6 @@ const RestaurantModel = {
     }
   },
 
-  // Assign a staff member to the restaurant
   assignStaff: async ({ RestaurantID, UserID, TargetUsername }) => {
     try {
       const pool = await poolPromise;
@@ -217,7 +205,6 @@ const RestaurantModel = {
     }
   },
 
-  // Remove a staff member from the restaurant
   removeStaff: async ({ RestaurantID, UserID, TargetUserID }) => {
     try {
       const pool = await poolPromise;
@@ -232,7 +219,6 @@ const RestaurantModel = {
     }
   },
 
-  // Add an image to the restaurant
   addImage: async ({ RestaurantID, Image, UserID }) => {
     try {
       const pool = await poolPromise;
@@ -247,7 +233,6 @@ const RestaurantModel = {
     }
   },
 
-  // Delete an image from the restaurant
   deleteImage: async ({ RestaurantID, ImageID, UserID }) => {
     try {
       const pool = await poolPromise;
@@ -262,7 +247,6 @@ const RestaurantModel = {
     }
   },
 
-  // Update restaurant status
   setRestaurantStatus: async ({ restaurantId, status }) => {
     try {
       const pool = await poolPromise;
@@ -276,7 +260,6 @@ const RestaurantModel = {
     }
   },
 
-  // Add a cuisine to a restaurant
   addCuisineToRestaurant: async ({ RestaurantID, CuisineID }) => {
     try {
       const pool = await poolPromise;
@@ -290,7 +273,6 @@ const RestaurantModel = {
     }
   },
 
-  // Remove a cuisine from a restaurant
   removeCuisineFromRestaurant: async ({ RestaurantID, CuisineID }) => {
     try {
       const pool = await poolPromise;
@@ -304,7 +286,6 @@ const RestaurantModel = {
     }
   },
 
-  // Get all cuisines for a restaurant
   getCuisinesForRestaurant: async (RestaurantID) => {
     try {
       const pool = await poolPromise;
