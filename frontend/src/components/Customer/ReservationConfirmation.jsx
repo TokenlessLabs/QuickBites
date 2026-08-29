@@ -9,7 +9,7 @@ const ReservationConfirmation = () => {
   const restaurantId = localStorage.getItem("restaurantId");
   const [restaurantName, setRestaurantName] = useState("");
   const [tables, setTables] = useState([]);
-  const [capacity, setCapacity] = useState("");
+  const [capacity, setCapacity] = useState("1");
 
   // Fetch restaurant name
   useEffect(() => {
