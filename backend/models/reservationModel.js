@@ -71,7 +71,7 @@ const ReservationModel = {
             SELECT 1
             FROM Reservations WITH (UPDLOCK, HOLDLOCK)
             WHERE TableID = @TableID
-              AND Status IN ('Pending', 'Approved')
+              AND Status = 'Approved'
               AND Time < DATEADD(MINUTE, @Duration, @Time)
               AND DATEADD(MINUTE, Duration, Time) > @Time
           )

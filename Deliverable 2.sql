@@ -1490,11 +1490,8 @@ BEGIN
         FROM Reservations
         WHERE TableID = @TableID
             AND Status = 'Approved'
-            AND (
-                    (Time BETWEEN @StartTime AND @EndTime) OR
-            (DATEADD(MINUTE, Duration, Time) BETWEEN @StartTime AND @EndTime) OR
-            (@StartTime BETWEEN Time AND DATEADD(MINUTE, Duration, Time))
-                 )
+            AND Time < @EndTime
+            AND DATEADD(MINUTE, Duration, Time) > @StartTime
         )
         BEGIN
             SELECT 'Available' AS Availability;
@@ -1528,8 +1525,9 @@ BEGIN
             SELECT 1
         FROM Reservations R
         WHERE R.TableID = T.TableID
-            AND R.Status in ('Approved','Completed','Pending')
-            AND (R.Time <= @EndTime AND DATEADD(MINUTE, R.Duration, R.Time) >= @StartTime)
+            AND R.Status = 'Approved'
+            AND R.Time < @EndTime
+            AND DATEADD(MINUTE, R.Duration, R.Time) > @StartTime
         )
     ORDER BY T.Capacity ASC;
 END;
@@ -1595,7 +1593,7 @@ BEGIN
         SELECT 1
         FROM Reservations
         WHERE TableID = @TableID
-          AND Status IN ('Pending', 'Approved')
+          AND Status = 'Approved'
           AND Time < DATEADD(MINUTE, @Duration, @Time)
           AND DATEADD(MINUTE, Duration, Time) > @Time
     )
@@ -1677,7 +1675,8 @@ BEGIN
         WHERE TableID = (SELECT TableID
             FROM Reservations
             WHERE ReservationID = @ReservationID)
-            AND Status IN ('Pending', 'Approved')
+            AND ReservationID <> @ReservationID
+            AND Status = 'Approved'
             AND (
                 @NewTime < DATEADD(MINUTE, Duration, Time) AND
             DATEADD(MINUTE, @NewDuration, @NewTime) > Time
@@ -1745,11 +1744,6 @@ BEGIN
     SET Status = 'Cancelled'
     WHERE ReservationID = @ReservationID AND Status IN ('Pending', 'Approved');
 
-    -- Set the associated table status to 'Free'
-    UPDATE Tables
-    SET Status = 'Free'
-    WHERE TableID = @TableID;
-
 END;
 GO
 
@@ -1760,29 +1754,63 @@ CREATE OR ALTER PROCEDURE ApproveReservation
 -- User requesting the approval (staff member)
 AS
 BEGIN
-    DECLARE @RestaurantID INT, @TableID INT;
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
-    -- Get the RestaurantID and TableID for the reservation
-    SELECT @RestaurantID = T.RestaurantID, @TableID = R.TableID
-    FROM Reservations R
+    BEGIN TRANSACTION;
+
+    DECLARE @RestaurantID INT, @TableID INT, @StartTime DATETIME,
+            @Duration INT, @EndTime DATETIME, @Status NVARCHAR(10);
+
+    -- Lock this request and the table's reservation range while a winner is chosen.
+    SELECT @RestaurantID = T.RestaurantID,
+           @TableID = R.TableID,
+           @StartTime = R.Time,
+           @Duration = R.Duration,
+           @Status = R.Status
+    FROM Reservations R WITH (UPDLOCK, HOLDLOCK)
         JOIN Tables T ON R.TableID = T.TableID
     WHERE R.ReservationID = @ReservationID;
+
+    IF @TableID IS NULL
+    BEGIN
+        ROLLBACK TRANSACTION;
+        RAISERROR ('Reservation does not exist.', 16, 1);
+        RETURN;
+    END
 
     -- Check if the user is a staff member of the same restaurant
     IF NOT EXISTS (SELECT 1
     FROM RestaurantStaff RS
     WHERE RS.RestaurantID = @RestaurantID AND RS.UserID = @UserID)
     BEGIN
+        ROLLBACK TRANSACTION;
         RAISERROR ('Only staff members of the restaurant can approve the reservation.', 16, 1);
         RETURN;
     END
 
     -- Ensure the reservation is in "Pending" status before approving
-    IF NOT EXISTS (SELECT 1
-    FROM Reservations
-    WHERE ReservationID = @ReservationID AND Status = 'Pending')
+    IF @Status <> 'Pending'
     BEGIN
+        ROLLBACK TRANSACTION;
         RAISERROR ('The reservation is not in Pending status.', 16, 1);
+        RETURN;
+    END
+
+    SET @EndTime = DATEADD(MINUTE, @Duration, @StartTime);
+
+    IF EXISTS (
+        SELECT 1
+        FROM Reservations WITH (UPDLOCK, HOLDLOCK)
+        WHERE TableID = @TableID
+          AND ReservationID <> @ReservationID
+          AND Status = 'Approved'
+          AND Time < @EndTime
+          AND DATEADD(MINUTE, Duration, Time) > @StartTime
+    )
+    BEGIN
+        ROLLBACK TRANSACTION;
+        RAISERROR ('Another reservation has already been approved for this time slot.', 16, 1);
         RETURN;
     END
 
@@ -1791,10 +1819,16 @@ BEGIN
     SET Status = 'Approved'
     WHERE ReservationID = @ReservationID;
 
-    -- Change the table status to 'Reserved'
-    UPDATE Tables
-    SET Status = 'Reserved'
-    WHERE TableID = @TableID;
+    -- The approved request wins this slot; close only overlapping pending requests.
+    UPDATE Reservations
+    SET Status = 'Cancelled'
+    WHERE TableID = @TableID
+      AND ReservationID <> @ReservationID
+      AND Status = 'Pending'
+      AND Time < @EndTime
+      AND DATEADD(MINUTE, Duration, Time) > @StartTime;
+
+    COMMIT TRANSACTION;
 END;
 GO
 
