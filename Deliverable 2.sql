@@ -1592,6 +1592,19 @@ BEGIN
     IF EXISTS (
         SELECT 1
         FROM Reservations
+        WHERE UserID = @UserID
+          AND Status IN ('Pending', 'Approved')
+          AND Time < DATEADD(MINUTE, @Duration, @Time)
+          AND DATEADD(MINUTE, Duration, Time) > @Time
+    )
+    BEGIN
+        RAISERROR('You already have a reservation during this time.', 16, 1);
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1
+        FROM Reservations
         WHERE TableID = @TableID
           AND Status = 'Approved'
           AND Time < DATEADD(MINUTE, @Duration, @Time)
