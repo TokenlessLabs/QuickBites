@@ -30,7 +30,11 @@ const Login = () => {
       const restaurantId = authRes.data.id;
       // Save user info
       localStorage.setItem("userId", JSON.stringify(user.UserID));
-      localStorage.setItem("restaurantId",restaurantId);
+      if (restaurantId) {
+        localStorage.setItem("restaurantId", restaurantId);
+      } else {
+        localStorage.removeItem("restaurantId");
+      }
 
       const userRole = user.Role;
 

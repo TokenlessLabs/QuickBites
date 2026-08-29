@@ -11,7 +11,7 @@ const Signup = () => {
     email: "",
     password: "",
     phone: "",
-    role: "customer",
+    role: "Customer",
     profilePic: null,
   });
   const [preview, setPreview] = useState(null);
@@ -93,6 +93,7 @@ const Signup = () => {
 
       // Store the user ID in local storage
       localStorage.setItem("userId", userId);
+      localStorage.removeItem("restaurantId");
 
       setModalVisible(true); // Show the modal on successful signup
     } catch (err) {
@@ -138,9 +139,7 @@ const Signup = () => {
 
   const handleModalClose = () => {
     setModalVisible(false);
-    if (formData.role === "Admin") {
-      navigate("/admin/restaurants");
-    } else if (formData.role === "Staff") {
+    if (formData.role === "Staff") {
       navigate("/staff/reservations");
     } else {
       navigate("/customer/restaurants");
@@ -271,7 +270,6 @@ const Signup = () => {
                 >
                   <option value="Customer">Customer</option>
                   <option value="Staff">Staff</option>
-                  <option value="Admin">Admin</option>
                 </select>
                 {errors.role && (
                   <p className="text-red-500 text-sm mt-1">{errors.role}</p>

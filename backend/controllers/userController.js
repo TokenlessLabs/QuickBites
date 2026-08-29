@@ -22,6 +22,9 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, username, password, email, phoneNum, role } = req.body;
+    if (role === 'Admin') {
+      return res.status(403).json({ error: 'Admin accounts cannot be created through signup.' });
+    }
     const profilePic = req.file ? req.file.buffer : null;
     const response = await UserModel.createUser(name, username, password, email, phoneNum, role, profilePic || null);
     res.status(201).json(response);

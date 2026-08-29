@@ -205,14 +205,22 @@ const UserModel = {
     }
   },
 
-  //get a staff restaurant
+  // Get all restaurants assigned to a staff member
   getStaffRestaurant: async (userId) => {
     try {
       const pool = await poolPromise;
       const result = await pool.request()
         .input('UserID', sql.Int, userId)
         .query(`
-          SELECT * FROM RestaurantStaff WHERE UserID=@UserID;
+          SELECT
+            R.RestaurantID,
+            R.Name,
+            R.Location,
+            R.Status
+          FROM RestaurantStaff RS
+          JOIN Restaurants R ON R.RestaurantID = RS.RestaurantID
+          WHERE RS.UserID = @UserID
+          ORDER BY R.Name;
         `);
 
       return result.recordset;

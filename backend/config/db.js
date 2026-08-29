@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const sql = require('mssql');
 
 
@@ -8,15 +9,13 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   server: process.env.DB_SERVER,
   database: process.env.DB_NAME,
-  //port: process.env.DB_PORT, 
+  port: Number(process.env.DB_PORT || 1433),
   options: {
     encrypt: false, // Set to true if using Azure
     enableArithAbort: true,
     trustServerCertificate: true,
   },
 };
-
-console.log("DB Config:", dbConfig);
 
 const poolPromise = new sql.ConnectionPool(dbConfig)
   .connect()

@@ -33,7 +33,7 @@ CREATE TABLE Restaurants(
     RestaurantID INT IDENTITY(1,1) PRIMARY KEY,
     Name NVARCHAR(50) NOT NULL,
     Description NVARCHAR(MAX) NOT NULL,
-    Location NVARCHAR(100) NOT NULL,
+    Location NVARCHAR(300) NOT NULL,
     PhoneNum NVARCHAR(13) UNIQUE NOT NULL,
     OperatingHoursStart TIME NOT NULL,
     OperatingHoursEnd TIME NOT NULL,

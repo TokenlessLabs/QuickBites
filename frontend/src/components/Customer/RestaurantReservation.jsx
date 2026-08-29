@@ -164,7 +164,9 @@ const RestaurantReservation = () => {
           >
             {Array.from({ length: 8 }, (_, i) => 0.5 + i * 0.5).map((val) => (
               <option key={val} value={val}>
-                {val === 0.5 ? "30 minutes" : `${val} hours`}
+                {val === 0.5
+                  ? "30 minutes"
+                  : `${val} ${val === 1 ? "hour" : "hours"}`}
               </option>
             ))}
           </select>

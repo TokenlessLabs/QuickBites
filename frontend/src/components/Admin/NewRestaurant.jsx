@@ -264,16 +264,17 @@ const NewRestaurant = () => {
       setIsSuccessModalOpen(true);
     } catch (err) {
       console.error("Submit error:", err);
-      if (
-        err.response?.data?.message ===
-        "A restaurant with this phone number already exists."
-      ) {
-        setSubmitError("A restaurant with this phone number already exists.");
-      } else {
-        setSubmitError(
-          "Something went wrong while registering the restaurant. Please try again."
-        );
-      }
+      const responseData = err.response?.data;
+      const validationDetails = responseData?.errors
+        ?.map((validationError) => validationError.msg)
+        .join(" ");
+
+      setSubmitError(
+        validationDetails ||
+          responseData?.error ||
+          responseData?.message ||
+          "Could not reach the server. Please make sure the backend is running."
+      );
     }
   };
 

@@ -5,25 +5,47 @@ const Tables = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedTable, setSelectedTable] = useState(null);
   const [tables, setTables] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updating, setUpdating] = useState(false);
 
-  const restaurantId = localStorage.getItem("restaurantId");
   const userId = localStorage.getItem("userId"); // adjust if stored differently
 
-  // Fetch tables from API
+  // Fetch all restaurants assigned to this staff member and their tables
   const fetchTables = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/restaurants/${restaurantId}/tables`
+      const restaurantResponse = await axios.get(
+        `http://localhost:5000/api/users/${userId}/get-Res`
       );
-      setTables(response.data);
+
+      const assignedRestaurants = restaurantResponse.data || [];
+      setRestaurants(assignedRestaurants);
+
+      if (assignedRestaurants.length === 0) {
+        setTables([]);
+        setError("You have not been assigned to a restaurant yet.");
+        return;
+      }
+
+      const tableResponses = await Promise.all(
+        assignedRestaurants.map(async (restaurant) => {
+          const response = await axios.get(
+            `http://localhost:5000/api/restaurants/${restaurant.RestaurantID}/tables`
+          );
+          return response.data.map((table) => ({
+            ...table,
+            RestaurantName: restaurant.Name,
+          }));
+        })
+      );
+
+      setTables(tableResponses.flat());
       setError(null);
     } catch (err) {
       if (err.response?.status === 404) {
-        setError("No tables found for this restaurant.");
+        setError("No tables found for your assigned restaurants.");
       } else {
         setError("Error fetching tables: " + err.message);
       }
@@ -33,8 +55,13 @@ const Tables = () => {
   };
 
   useEffect(() => {
-    if (restaurantId) fetchTables();
-  }, [restaurantId]);
+    if (userId) {
+      fetchTables();
+    } else {
+      setError("Please log in to view your assigned restaurants.");
+      setLoading(false);
+    }
+  }, [userId]);
 
   // Filter tables by status
   const filteredTables = tables.filter((table) =>
@@ -104,6 +131,24 @@ const Tables = () => {
           </div>
         </div>
 
+        {restaurants.length > 0 && (
+          <div className="mb-6">
+            <div className="text-gray-500 text-sm mb-2">
+              Assigned Restaurants
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {restaurants.map((restaurant) => (
+                <span
+                  key={restaurant.RestaurantID}
+                  className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-theme-brown shadow-sm"
+                >
+                  {restaurant.Name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <p>Loading tables...</p>
         ) : error ? (
@@ -119,6 +164,9 @@ const Tables = () => {
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">
                   Table {i + 1}
                 </h2>
+                <div className="text-theme-pink font-semibold mb-2">
+                  {table.RestaurantName}
+                </div>
                 <div className="text-gray-600 mb-2">
                   <strong>Capacity: </strong>
                   {table.Capacity} seats
@@ -156,6 +204,9 @@ const Tables = () => {
             <div className="mb-4 space-y-2">
               <p>
                 <strong>Table:</strong> #{selectedTable.TableID}
+              </p>
+              <p>
+                <strong>Restaurant:</strong> {selectedTable.RestaurantName}
               </p>
               <p>
                 <strong>Capacity:</strong> {selectedTable.Capacity} people
