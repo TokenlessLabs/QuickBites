@@ -1489,7 +1489,7 @@ BEGIN
             SELECT 1
         FROM Reservations
         WHERE TableID = @TableID
-            AND Status = 'Approved'
+            AND Status IN ('Pending', 'Approved')
             AND Time < @EndTime
             AND DATEADD(MINUTE, Duration, Time) > @StartTime
         )
@@ -1525,7 +1525,7 @@ BEGIN
             SELECT 1
         FROM Reservations R
         WHERE R.TableID = T.TableID
-            AND R.Status = 'Approved'
+            AND R.Status IN ('Pending', 'Approved')
             AND R.Time < @EndTime
             AND DATEADD(MINUTE, R.Duration, R.Time) > @StartTime
         )
@@ -1606,7 +1606,7 @@ BEGIN
         SELECT 1
         FROM Reservations
         WHERE TableID = @TableID
-          AND Status = 'Approved'
+          AND Status IN ('Pending', 'Approved')
           AND Time < DATEADD(MINUTE, @Duration, @Time)
           AND DATEADD(MINUTE, Duration, Time) > @Time
     )
